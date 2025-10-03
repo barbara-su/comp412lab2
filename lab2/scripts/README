@@ -1,0 +1,60 @@
+This directory contains a couple of small python scripts that
+might help test your lab 2 allocator. 
+
+Please report problems on Piazza.
+
+TEST SCRIPT:
+
+The test script runs an executable allcoator against a directory of ILOC
+files, runs each allocated file on the simulator, and checks the results
+against the expected results (recorded in the //SIM INPUT and //OUTPUT 
+directives in the ILOC file).
+
+The syntax is:
+
+   test <executable name>  <directory of ILOC files>
+
+So, to run lab2_ref on the report blocks, you might type
+
+   ./tester ~comp412/students/lab2/lab2_ref  ~comp412/students/lab2/report
+
+The script reports its results in two ways. It prints a brief summary to
+stdout. It writes a logfile in the current directory, named with your netid.
+The logfile contains more information.
+
+If the tester reports that the allocator under test failed on some file x
+at a specific value of k, that tells you that the allocated code for that
+value of k produced different results than the original code. That should
+give you place to start looking for the bug.
+
+NOTE: The script writes the log file into the directory where it is invoked.
+For that reason, you should copy 'tester' into your own file system subtree.
+It overwrites the log file on every run.
+
+Do not try to run multiple instances of the tester from multiple shells on 
+the same machine. The tester creates a directory in /tmp to hold all of the
+miscellaneous files that it creates. Having multiple tester instances sharing
+a single temporary directory will likely produce really bad results.
+
+TIMING SCRIPT:
+
+The timing script is similar to the test script, except that it always
+runs the executable against the ILOC SLOCs Scalability test found in 
+~comp412/students/ILOC/Scalability/SLOCs. This script runs each test once.
+[The autotimer runs each test multiple times and reports the minimum.]
+
+
+The syntax is:
+
+    timer <executable name>
+
+The timer reports its results to stdout.
+
+Note that timing results are sensitive to system load. As the due date for
+the project approaches, the load factors on CLEAR systems will rise and the
+timing results will become much noisier. The minimum observed time for a
+given size of input is the most accurate; interference from other tasks
+can increase the observed time but cannot decrease it.
+
+
+updates 09/22/2024

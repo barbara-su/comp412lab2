@@ -1,0 +1,9 @@
+COMP 412, Lab 2
+
+lab2sim.tar contains the source code for the ILOC simulator used
+	    in checking and grading lab 2.
+
+SimDoc.pdf describes the ILOC simulator, its various options and
+	   features, and the specific parameters of the lab 2
+	   simulator.  (See especially Section 7.1)
+

@@ -1,0 +1,6 @@
+COMP 412, Lab 2 Code Check:
+0
+164
+
+Executed 62 instructions and 62 operations in 68 cycles.
+Code Check: failed, with 37 reassignments.

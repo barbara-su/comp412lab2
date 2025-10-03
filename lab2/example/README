@@ -1,0 +1,31 @@
+This directory contains the two versions of the ILOC block
+from slide 25 of the second Lab 2 Video.
+
+     slides-original.i is the code before renaming
+     slides-renamed.i is the code after renaming
+
+Both blocks expect input of -i 128 1 2 3 and both blocks should
+produce the number 7 on stdout.
+
+If you run the blocks with the simulator's -x option, you should
+the following results.
+
+    [comp412@jade example]$ ../sim -x -i 128 1 2 3 slides-original.i 
+    COMP 412, Lab 2 Code Check:
+    7
+
+    Executed 10 instructions and 10 operations in 14 cycles.
+    Code Check: failed, with 2 reassignments.
+    [comp412@jade example]$ 
+
+If you look at the original block, it defines each of r1 and r3 twice.
+By contrast, the renamed block defines each register name exactly once.
+
+    [comp412@jade example]$ ../sim -x -i 128 1 2 3 slides-renamed.i 
+    COMP 412, Lab 2 Code Check:
+    7
+
+    Executed 10 instructions and 10 operations in 14 cycles.
+    Code Check: passed.
+    [comp412@jade example]$
+

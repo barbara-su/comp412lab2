@@ -1,0 +1,48 @@
+COMP 412, Fall 2023
+
+The lab2 autograder / autotimer is similar to the equivalent tools from lab1.
+
+TO MAKE THIS WORK IN YOUR DIRECTORY:
+
+1. Unpack the tar file. It will create a directory l2ag.
+
+2. Edit auto_grade/auto_grade.py and change the setting of the
+   variable "base_name" so that it has the path name to the directory
+   containing the RunGrader script.  "base_dir" must end in a slash ("/").
+
+3. Edit auto_time/auto_time.py and change the setting of the
+   variable "base_name" so that it has the path name to the directory
+   containing the RunGrader script.  "base_name" must end in a slash ("/").
+
+4. To run the autograder, place your tar archive file in the directory
+   TarFileGoesHere. Then, invoke the script "./Grader".  Results are
+   written into a log file whose name begins with "Timer-" and into 
+   the file "./results/Score.txt".
+
+   The autograder performs a quick estimation of scalability. For more
+   accurate results, use the autotimer.
+
+5. To run the autotimer, place your tar archive file in the directory
+   TarFileGoesHere. Then, invoke the script "./Timer".  Results are 
+   written into a log file whose name begins with "Grader-" and into
+   the file "./results/TimerResults.txt
+
+   If you want to increase the number of trials that the autotimer makes
+   at each size, change the setting of the variable NumberOfTrials in 
+   auto_time/auto_time.py. WARNING: This change may make a difference on 
+   a small scale. If your lab is running over 20 seconds, the problem is 
+   not with the number of trials.  In this situation, don't increase the
+   number of trials as it will just increase the workload on the system.
+
+The files in the results directory are tab-separated and suitable for importing
+into your favorite spreadsheet program.
+
+The blocks for the autograder can be found in auto_grade/blocks/. The blocks
+in the distributed autograder constitute about half of the blocks that we 
+will use when we grade your final submission.
+
+-------------------------------
+If you include multiple tar archives, each will be scored.
+The "comp412" tar file uses lab2_ref.
+
+

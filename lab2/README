@@ -1,0 +1,57 @@
+COMP 412 Lab 2
+
+This directory contains:
+
+  autograder:   contains the distribution of the "stripped down" autograder
+  		and autotimer.
+
+  CodeChecks: 	The tools needed to demonstrate that your implementation
+  		passes code check 1 and code check 2.
+
+		See the README file in the CodeChecks directory.
+
+  lab2_ref:     the reference implementation of the ILOC local register
+  		allocator.  Note that lab2_ref DOES NOT implement the -x 
+		command-line flag.
+
+		The comments in the output file may provide some insight
+		into what lab2_ref is doing to the input program.
+
+  README:	This file
+
+  report:  	a subset of the test blocks that we will use to grade your
+  		implementation. These are included in the "stripped down"
+		autograder.
+
+		The production autograder will also use some test blocks that
+		are hidden from you.
+
+
+ scripts:	This directory contains both a testing script and a timing
+ 		script. The testing script invokes your allocator at a
+		variety of values of k on every ILOC file in a directory.
+
+		For each file and each value of k, the testing script
+		checks the allocated code by running it through the
+		simulator and verifying that the allocated code produces
+		the answers specified in the //OUTPUT: specification.
+
+		The timing script uses the SLOCs scalability blocks to
+		provide a quick timing test. The autotimer is both slower
+		and more precise.
+  sim:		an executable version of the lab 2 ILOC simulator compiled
+  		for execution on CLEAR (see next entry).
+
+  simulator:	This directory contains the code for the lab 2 ILOC 
+  		simulator. You will need to use the simulator to test your
+		allocator. If you want a copy to use locally, lab2sim.tar
+		should contain everything necessary to build one. The file
+		SimDoc.pdf provides details on operation of the simulator.
+
+		Note that the lab 2 simulator is different than the lab 3
+		simulator.
+
+  slides.i:	The ILOC block used as an example in the lab video on allocation.
+		
+
+Updated September 2024
