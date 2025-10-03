@@ -41,4 +41,8 @@ IRNode *ir_build(IROpcode op, int line, int nops, ...);
 // print function
 void ir_print(void);
 
+// renames
+void ir_rename(void);
+void ir_rename_print(void);
+
 #endif
