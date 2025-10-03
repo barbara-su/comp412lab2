@@ -1,10 +1,10 @@
 #include "ir.h"
 
+#include <limits.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <string.h>
-#include <limits.h>
 
 #define POOL_SIZE 2000
 
@@ -95,12 +95,11 @@ IRNode *ir_new_node(IROpcode opcode, int line) {
     n->opcode = opcode;
 
     memset(&n->op1, -1, 3 * sizeof(IROperand));
-    
+
     insert_into_node_list(n);
 
     return n;
 }
-
 
 IRNode *ir_build(IROpcode op, int line, int nops, ...) {
     IRNode *n = ir_new_node(op, line);
@@ -109,21 +108,20 @@ IRNode *ir_build(IROpcode op, int line, int nops, ...) {
     va_start(args, nops);
 
     if (nops == 1) n->op1.sr = va_arg(args, int);
-    if (nops == 2){
+    if (nops == 2) {
         n->op1.sr = va_arg(args, int);
         n->op3.sr = va_arg(args, int);
-    } 
-    if (nops == 3){
+    }
+    if (nops == 3) {
         n->op1.sr = va_arg(args, int);
         n->op2.sr = va_arg(args, int);
         n->op3.sr = va_arg(args, int);
-    } 
+    }
 
     va_end(args);
-    
+
     return n;
 }
-
 
 static void print_operand(IROperand *op, int is_const) {
     if (op->sr != -1) {
@@ -175,7 +173,7 @@ void ir_print(void) {
 
         switch (n->opcode) {
             case IR_LOADI:
-                print_operand(&n->op1, 1); // constant
+                print_operand(&n->op1, 1);  // constant
                 printf(", ");
                 print_operand(&n->op2, 0);
                 printf(", ");
@@ -184,7 +182,7 @@ void ir_print(void) {
                 break;
 
             case IR_OUTPUT:
-                print_operand(&n->op1, 1); // constant
+                print_operand(&n->op1, 1);  // constant
                 printf(", ");
                 print_operand(&n->op2, 0);
                 printf(", ");
@@ -205,14 +203,14 @@ void ir_print(void) {
     }
 }
 
-void ir_rename(void){
+void ir_rename(void) {
     // Note: in a, (b) => c; c is definition, and a, b are uses
     int VRName = 0;
     int block_len = 0;
     int maxSR = 0;
 
     // walk through the blocks to compute block length to compute block_len and maxSR
-    for (IRNode *p = node_head -> next; p != node_head; p = p->next){
+    for (IRNode *p = node_head->next; p != node_head; p = p->next) {
         block_len++;
         // find max sr
         if (p->op1.sr > maxSR) maxSR = p->op1.sr;
@@ -225,123 +223,114 @@ void ir_rename(void){
     int *LU = calloc(maxSR + 1, sizeof(int));
 
     int i = 0;
-    for (i = 0; i <= maxSR; i++){
+    for (i = 0; i <= maxSR; i++) {
         SRToVR[i] = -1;
         LU[i] = INT_MAX;
     }
     int index = block_len - 1;
 
-    // sr for o1, o2, o3
-    IROperand op1, op2, op3;
-
     // Iterate backward through doubly linked list
-    for (IRNode *p = node_head->prev; p != node_head; p = p->prev){
-        op1 = p->op1;
-        op2 = p->op2;
-        op3 = p->op3;
-
-        // handle use
-        switch (p->opcode)
-        {
-        // use only r1
-        case IR_LOAD:
-        case IR_STORE:
-            if (SRToVR[op1.sr] == -1) VRName++;
-            op1.vr = SRToVR[op1.sr];
-            op1.nu = LU[op1.sr];
-            SRToVR[op1.sr] = -1;
-            LU[op1.sr] = INT_MAX;
-            break;
-        
-        // use both r1 and r2
-        case IR_ADD:
-        case IR_SUB:
-        case IR_MULT:
-        case IR_LSHIFT:
-        case IR_RSHIFT:
-            // use r1
-            if (SRToVR[op1.sr] == -1) VRName++;
-            op1.vr = SRToVR[op1.sr];
-            op1.nu = LU[op1.sr];
-            SRToVR[op1.sr] = -1;
-            LU[op1.sr] = INT_MAX;
-            
-            // use r2
-            if (SRToVR[op2.sr] == -1) VRName++;
-            op2.vr = SRToVR[op2.sr];
-            op2.nu = LU[op2.sr];
-            SRToVR[op2.sr] = -1;
-            LU[op2.sr] = INT_MAX;
-            break;
-        default:
-            break;
-        }
-
+    for (IRNode *p = node_head->prev; p != node_head; p = p->prev) {
         // handle define
-        switch (p->opcode)
-        {
-        // define r2
-        case IR_LOAD:
-        case IR_LOADI:
-        case IR_STORE:
-            if (SRToVR[op2.sr] == -1) VRName++;
-            op2.vr = SRToVR[op2.sr];
-            op2.nu = LU[op2.sr];
-            LU[op2.sr] = index;
-            break;
+        switch (p->opcode) {
+            // define r3
+            case IR_LOAD:
+            case IR_LOADI:
+            case IR_ADD:
+            case IR_SUB:
+            case IR_MULT:
+            case IR_LSHIFT:
+            case IR_RSHIFT:
+                if (SRToVR[p->op3.sr] == -1) SRToVR[p->op3.sr] = VRName++;
+                p->op3.vr = SRToVR[p->op3.sr];
+                p->op3.nu = LU[p->op3.sr];
+                SRToVR[p->op3.sr] = -1;
+                LU[p->op3.sr] = INT_MAX;
+                break;
 
-        // define r3
-        case IR_ADD:
-        case IR_SUB:
-        case IR_MULT:
-        case IR_LSHIFT:
-        case IR_RSHIFT:
-            if (SRToVR[op3.sr] == -1) VRName++;
-            op3.vr = SRToVR[op3.sr];
-            op3.nu = LU[op3.sr];
-            LU[op3.sr] = index;
-            break;
+            default:
+                break;
+        }
+        
+        // handle use
+        switch (p->opcode) {
+            // use only r1
+            case IR_LOAD:
+                if (SRToVR[p->op1.sr] == -1) SRToVR[p->op1.sr] = VRName++;
+                p->op1.vr = SRToVR[p->op1.sr];
+                p->op1.nu = LU[p->op1.sr];
+                LU[p->op1.sr] = index;
+                break;
 
-        default:
-            break;
+            // use both r1 and r2
+            case IR_ADD:
+            case IR_SUB:
+            case IR_MULT:
+            case IR_LSHIFT:
+            case IR_RSHIFT:
+                // use r1
+                if (SRToVR[p->op1.sr] == -1) SRToVR[p->op1.sr] = VRName++;
+                p->op1.vr = SRToVR[p->op1.sr];
+                p->op1.nu = LU[p->op1.sr];
+                LU[p->op1.sr] = index;
+
+                // use r2
+                if (SRToVR[p->op2.sr] == -1) SRToVR[p->op2.sr] = VRName++;
+                p->op2.vr = SRToVR[p->op2.sr];
+                p->op2.nu = LU[p->op2.sr];
+                LU[p->op2.sr] = index;
+                break;
+
+            // use both r1 and r3
+            case IR_STORE:
+                // use r1
+                if (SRToVR[p->op1.sr] == -1) SRToVR[p->op1.sr] = VRName++;
+                p->op1.vr = SRToVR[p->op1.sr];
+                p->op1.nu = LU[p->op1.sr];
+                LU[p->op1.sr] = index;
+
+                // use r3
+                if (SRToVR[p->op3.sr] == -1) SRToVR[p->op3.sr] = VRName++;
+                p->op3.vr = SRToVR[p->op3.sr];
+                p->op3.nu = LU[p->op3.sr];
+                LU[p->op3.sr] = index;
+                break;
+            default:
+                break;
         }
         index--;
     }
 }
 
 void ir_rename_print(void) {
-    IROperand op1, op2, op3;
     for (IRNode *p = node_head->next; p != node_head; p = p->next) {
-        op1 = p->op1;
-        op2 = p->op2;
-        op3 = p->op3;
         switch (p->opcode) {
             case IR_LOADI:
-                printf("loadI  %d    => r%d\n", op1.sr, op2.vr);
+                printf("loadI\t%d\t=> r%d\n", p->op1.sr, p->op3.vr);
                 break;
             case IR_LOAD:
-                printf("load   r%d    => r%d\n", op1.vr, op2.vr);
+                printf("load\tr%d\t=> r%d\n", p->op1.vr, p->op3.vr);
                 break;
             case IR_STORE:
-                printf("store  r%d    => r%d\n", op1.vr, op2.vr);
+                printf("store\tr%d\t=> r%d\n", p->op1.vr, p->op3.vr);
                 break;
             case IR_ADD:
-                printf("add    r%d, r%d => r%d\n", op1.vr, op2.vr, op3.vr);
+                printf("add\tr%d, r%d\t=> r%d\n", p->op1.vr, p->op2.vr, p->op3.vr);
                 break;
             case IR_SUB:
-                printf("sub    r%d, r%d => r%d\n", op1.vr, op2.vr, op3.vr);
+                printf("sub\tr%d, r%d\t=> r%d\n", p->op1.vr, p->op2.vr, p->op3.vr);
                 break;
             case IR_MULT:
-                printf("mult   r%d, r%d => r%d\n", op1.vr, op2.vr, op3.vr);
+                printf("mult\tr%d, r%d\t=> r%d\n", p->op1.vr, p->op2.vr, p->op3.vr);
                 break;
             case IR_LSHIFT:
-                printf("lshift r%d, r%d => r%d\n", op1.vr, op2.vr, op3.vr);
+                printf("lshift\tr%d, r%d\t=> r%d\n", p->op1.vr, p->op2.vr, p->op3.vr);
                 break;
             case IR_RSHIFT:
-                printf("rshift r%d, r%d => r%d\n", op1.vr, op2.vr, op3.vr);
+                printf("rshift r%d, r%d\t=> r%d\n", p->op1.vr, p->op2.vr, p->op3.vr);
                 break;
             case IR_OUTPUT:
-                printf("output %d\n", op1.sr);
+                printf("output %d\n", p->op1.sr);
                 break;
             default:
                 printf("nop\n");
